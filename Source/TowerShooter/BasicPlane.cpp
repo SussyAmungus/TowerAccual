@@ -71,7 +71,7 @@ void ABasicPlane::Tick(float DeltaTime)
 
 	
 
-
+	//JHohnscon
 	
 
 	if (Target) {
