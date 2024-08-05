@@ -4,7 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "InputActionValue.h"
 #include "Tower.generated.h"
+
+class UInputMappingContext;
+class UInputAction;
+
 
 UCLASS()
 class TOWERSHOOTER_API ATower : public APawn
@@ -19,6 +24,20 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere)
+	UInputMappingContext* PlayerMapCont;
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* Rotatato;
+
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* Looko;
+
+	void Rotater(const FInputActionValue& Value);
+
+	void Look(const FInputActionValue& Value);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -31,6 +50,13 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* BoxCollide;
+
+	UPROPERTY(EditAnywhere)
+	class USpringArmComponent* SpringArm;
+
+
+	UPROPERTY(EditAnywhere)
+	class UCameraComponent* Cam;
 
 
 

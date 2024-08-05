@@ -6,8 +6,6 @@
 #include "Components/InterpToMovementComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameFramework/PlayerController.h"
-#include "GameFramework/Character.h"
 #include "EngineUtils.h"
 
 
@@ -19,50 +17,51 @@ ABasicPlane::ABasicPlane()
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	BoxCollide = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collider"));
 
-	Root = CreateDefaultSubobject<USceneComponent>(TEXT("ROOT"));
-	RootComponent = Root;
 
+	UWorld* World = GEditor->GetEditorWorldContext().World();
+
+	//UWorld* World = GetWorld();
+
+	if (World != nullptr) {
+		TArray<AActor*> Towers = TArray<AActor*>();
+		UGameplayStatics::GetAllActorsOfClass(World, ATower::StaticClass(), Towers);
+
+		if (Towers.Num() > 0) {
+
+			Target = (ATower*)Towers[0];
+		}
+
+		
+		//UBoxComponent* TowerCollide = Target->FindComponentByClass<UBoxComponent>();
+
+		//FVector FBOX = TowerCollide->GetScaledBoxExtent();
+
+
+
+		
+
+
+		BoxCollide = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collider"));
+
+		Root = CreateDefaultSubobject<USceneComponent>(TEXT("ROOT"));
+		RootComponent = Root;
+
+
+
+		
+	}
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	BoxCollide->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetIncludingScale);
-
-	
+	//BoxCollide->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetIncludingScale);
 }  
-
-
-
 
 // Called when the game starts or when spawned
 void ABasicPlane::BeginPlay()
 {
 	Super::BeginPlay();
-
-
-	FTimerHandle WhenSpawn;
-	//GetWorld()->GetTimerManager().SetTimer(WhenSpawn, this, &ABasicPlane::InitTarget, 3.0f);
-	//InitTarget();SetTimer(WhenSpaw, this, &ABasicPlane::InitTarget, 3.0f, false);
-
-
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-
-	if (PlayerController)
-	{
-		// Get the player character
-		APawn* PlayerPawn= PlayerController->GetPawn();
-
-		ATower* tt = CastChecked<ATower>(PlayerPawn);
-
-		if (tt) {
-
-			Target = tt;
-
-		}
-
-		
-	}
+	
 	
 
 }
@@ -78,13 +77,6 @@ void ABasicPlane::Tick(float DeltaTime)
 
 	//JHohnscon
 	
-	//Target = GameMode->GetPlayer
-
-	// = GameMode->Get
-
-
-
-
 
 	if (Target) {
 
@@ -143,7 +135,7 @@ void ABasicPlane::MovePlane(float Delta) {
 
 	if (GEngine)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Vector: %s"), *NewLocation.ToString()));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Vector: %s"), *NewLocation.ToString()));
 
 	}
 	
@@ -154,40 +146,6 @@ void ABasicPlane::MovePlane(float Delta) {
 	//SetActorLocation(Location);
 
 	//float sin = FMath::Sin();
-}
-
-void ABasicPlane::InitTarget()
-{
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString(TEXT("INIT")));
-
-	}
-
-	//CASUSES ALLOT OF ISSUES LIKE ALLOT IF YOU CANT GET INTO WORLD THEN YOU MUST DISABLE ALLOT, FIX LATER
-	UWorld* World = GEditor->GetEditorWorldContext().World();
-
-	//UWorld* World = GetWorld();
-
-	if (World != nullptr) {
-		TArray<AActor*> Towers = TArray<AActor*>();
-		UGameplayStatics::GetAllActorsOfClass(World, ATower::StaticClass(), Towers);
-
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Myint = %d"), Towers.Num()));
-
-		}
-
-		if (Towers.Num() > 0) {
-
-			
-
-			Target = (ATower*)Towers[0];
-		}
-
-	}
 }
 
 

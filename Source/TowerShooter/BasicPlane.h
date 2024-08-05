@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Tower.h"
+#include "GameFramework/GameMode.h"
+#include "TimerManager.h"
 #include "BasicPlane.generated.h"
 
 UCLASS()
@@ -28,7 +30,10 @@ public:
 
 	void MovePlane(float Delta);
 
+	void InitTarget();
 
+	
+	
 	 
 	UPROPERTY()
 	USceneComponent* Root;
@@ -45,7 +50,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	float Radius;
 
+
+	
 	ATower* Target;
+
+	UPROPERTY(EditAnywhere)
+	AGameModeBase* GameMode;
 
 
 	UPROPERTY(EditAnywhere)
