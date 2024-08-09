@@ -41,6 +41,9 @@ void ABasicPlane::BeginPlay()
 	Super::BeginPlay();
 
 
+
+	//Radius = 500;
+
 	FTimerHandle WhenSpawn;
 	//GetWorld()->GetTimerManager().SetTimer(WhenSpawn, this, &ABasicPlane::InitTarget, 3.0f);
 	//InitTarget();SetTimer(WhenSpaw, this, &ABasicPlane::InitTarget, 3.0f, false);
@@ -50,6 +53,9 @@ void ABasicPlane::BeginPlay()
 
 	if (PlayerController)
 	{
+
+		
+
 		// Get the player character
 		APawn* PlayerPawn= PlayerController->GetPawn();
 
@@ -59,10 +65,18 @@ void ABasicPlane::BeginPlay()
 
 			Target = tt;
 
+			UBoxComponent* TowerCollide = Target->FindComponentByClass<UBoxComponent>();
+
+			FVector FBOX = TowerCollide->GetScaledBoxExtent();
+
+			float height = FBOX.Z * HeightPercent;
+			CenterPnt = FVector(Target->GetActorLocation().X, Target->GetActorLocation().Y, height);
 		}
 
 		
 	}
+
+
 	
 
 }
@@ -103,6 +117,11 @@ void ABasicPlane::Tick(float DeltaTime)
 
 void ABasicPlane::MovePlane(float Delta) {
 
+	if (GEngine){
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString(TEXT("Moving")));
+
+	}
+
 	UBoxComponent* TowerCollide = Target->FindComponentByClass<UBoxComponent>();
 
 	FVector FBOX = TowerCollide->GetScaledBoxExtent();
@@ -115,8 +134,10 @@ void ABasicPlane::MovePlane(float Delta) {
 
 	//FRotator NewRot = FRotator(Rot.Yaw, Rot.Pitch, Rot.Roll + Delta * 0.1);
 	
-	FVector CenterPnt = FVector(Target->GetActorLocation().X, Target->GetActorLocation().Y, height);
+	
+	
 
+	
 	
 	
 

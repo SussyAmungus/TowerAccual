@@ -50,7 +50,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	float Radius;
 
-
+	FVector CenterPnt;
 	
 	ATower* Target;
 

@@ -34,9 +34,28 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UInputAction* Looko;
 
+	UPROPERTY(EditAnywhere)
+	UInputAction* Zoomo;
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* UpDowno;
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* Shooto;
+
 	void Rotater(const FInputActionValue& Value);
 
-	void Look(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);  
+
+	void Zoom(const FInputActionValue& Value);
+
+	void UpDown(const FInputActionValue& Value);
+
+	void Fire(const FInputActionValue& Value);
+
+	 
+
+
 
 public:	
 	// Called every frame
@@ -58,6 +77,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* Cam;
 
+
+	float ArmRadius;
+
+	int Zpos;
 
 
 	// Called to bind functionality to input
