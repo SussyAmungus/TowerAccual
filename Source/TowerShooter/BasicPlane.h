@@ -50,6 +50,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	float Radius;
 
+
+	//Bottom Most starts at 0
+	int Block;
+
 	FVector CenterPnt;
 	
 	ATower* Target;

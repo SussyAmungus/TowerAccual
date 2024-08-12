@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Character.h"
+#include "TowerBlock.h"
 #include "EngineUtils.h"
 
 
@@ -44,7 +45,7 @@ void ABasicPlane::BeginPlay()
 
 	//Radius = 500;
 
-	FTimerHandle WhenSpawn;
+	//FTimerHandle WhenSpawn;
 	//GetWorld()->GetTimerManager().SetTimer(WhenSpawn, this, &ABasicPlane::InitTarget, 3.0f);
 	//InitTarget();SetTimer(WhenSpaw, this, &ABasicPlane::InitTarget, 3.0f, false);
 
@@ -65,12 +66,7 @@ void ABasicPlane::BeginPlay()
 
 			Target = tt;
 
-			UBoxComponent* TowerCollide = Target->FindComponentByClass<UBoxComponent>();
 
-			FVector FBOX = TowerCollide->GetScaledBoxExtent();
-
-			float height = FBOX.Z * HeightPercent;
-			CenterPnt = FVector(Target->GetActorLocation().X, Target->GetActorLocation().Y, height);
 		}
 
 		
@@ -108,7 +104,12 @@ void ABasicPlane::Tick(float DeltaTime)
 
 		}
 
-		MovePlane(DeltaTime);
+		if (Target->CheckBlockExistance()) {
+			MovePlane(DeltaTime);
+
+		}
+
+		
 	}
 
 
@@ -122,15 +123,15 @@ void ABasicPlane::MovePlane(float Delta) {
 
 	}
 
-	UBoxComponent* TowerCollide = Target->FindComponentByClass<UBoxComponent>();
+	//UBoxComponent* TowerCollide = Target->FindComponentByClass<UBoxComponent>();
 
-	FVector FBOX = TowerCollide->GetScaledBoxExtent();
+	//FVector FBOX = TowerCollide->GetScaledBoxExtent();
 
-	float height = FBOX.Z * HeightPercent;
+	//float height = FBOX.Z * HeightPercent;
 
 	
-	FRotator Rot = GetActorRotation();
-	FVector Location = GetActorLocation();
+	//FRotator Rot = GetActorRotation();
+	//FVector Location = GetActorLocation();
 
 	//FRotator NewRot = FRotator(Rot.Yaw, Rot.Pitch, Rot.Roll + Delta * 0.1);
 	
@@ -145,28 +146,48 @@ void ABasicPlane::MovePlane(float Delta) {
 
 	//EEE.X
 
+
+	//UBoxComponent* TowerCollide = Target->FindComponentByClass<UBoxComponent>();
+
+	//FVector FBOX = TowerCollide->GetScaledBoxExtent();
+
+	if (Target->TowerStack[Block]) {
+
+		//UBoxComponent* TowerCollide = Target->TowerStack[Block]->FindComponentByClass<UBoxComponent>();
+		UTowerBlock* BlockTarget = Target->TowerStack[Block];
+		UBoxComponent* TowerCollide = BlockTarget->BoxCollide;
+
+		FVector FBOX = TowerCollide->GetScaledBoxExtent();
+
+		float height = FBOX.Z * HeightPercent;
+		CenterPnt = FVector(Target->GetActorLocation().X, Target->GetActorLocation().Y, height);
+
+
+		CurrentAngle += Speed * Delta;
+
+		// Keep the angle within 0-360 degrees
+		if (CurrentAngle >= 360.0f)
+		{
+			CurrentAngle -= 360.0f;
+		}
+
+		// Calculate the new position of the actor
+		float Radians = FMath::DegreesToRadians(CurrentAngle);
+		FVector NewLocation = CenterPnt + FVector(Radius * FMath::Cos(Radians), Radius * FMath::Sin(Radians), 0.0f);
+
+		// Set the new location of the actor
+		SetActorLocation(NewLocation);
+
+	}
+
+
 	
 
-	CurrentAngle += Speed * Delta;
-
-	// Keep the angle within 0-360 degrees
-	if (CurrentAngle >= 360.0f)
-	{
-		CurrentAngle -= 360.0f;
-	}
-
-	// Calculate the new position of the actor
-	float Radians = FMath::DegreesToRadians(CurrentAngle);
-	FVector NewLocation = CenterPnt + FVector(Radius * FMath::Cos(Radians), Radius * FMath::Sin(Radians), 0.0f);
-
-	// Set the new location of the actor
-	SetActorLocation(NewLocation);
-
-	if (GEngine)
-	{
+	//if (GEngine)
+	//{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Vector: %s"), *NewLocation.ToString()));
 
-	}
+	//}
 	
 
 

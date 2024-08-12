@@ -9,7 +9,9 @@
 
 class UInputMappingContext;
 class UInputAction;
-
+class UCurveVector;
+class UTowerBlock;
+class APlayerBullet;
 
 UCLASS()
 class TOWERSHOOTER_API ATower : public APawn
@@ -43,6 +45,10 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UInputAction* Shooto;
 
+
+//	UPROPERTY(EditAnywhere)
+//	UCurveVector* Curve;
+
 	void Rotater(const FInputActionValue& Value);
 
 	void Look(const FInputActionValue& Value);  
@@ -53,7 +59,9 @@ protected:
 
 	void Fire(const FInputActionValue& Value);
 
-	 
+	void ResetFire();
+
+	
 
 
 
@@ -61,18 +69,39 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere)
+	class TSubclassOf <APlayerBullet> Bulletito;
+
+	UPROPERTY(EditAnywhere)
+	float fireDelay;
+
+	bool canFire = true;
+
+	
+
 	UPROPERTY()
 	USceneComponent* Root;
 
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* Mesh;
+	//UPROPERTY(EditAnywhere)
+	//UStaticMeshComponent* BasicMesh;
 
-	UPROPERTY(EditAnywhere)
-	class UBoxComponent* BoxCollide;
+//	UPROPERTY(EditAnywhere)
+//	class UBoxComponent* BoxCollide;
 
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* SpringArm;
 
+	//UPROPERTY(EditAnywhere)
+	//class UTowerBlock* TemplateBlock;
+
+	TArray<UTowerBlock*> TowerStack;
+
+	double runningSum;
+
+	void TEMPAddBasicTower();
+
+	void AddBasicTower();
+	bool CheckBlockExistance();
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* Cam;
@@ -80,7 +109,7 @@ public:
 
 	float ArmRadius;
 
-	int Zpos;
+	//int Zpos; Reduntent
 
 
 	// Called to bind functionality to input

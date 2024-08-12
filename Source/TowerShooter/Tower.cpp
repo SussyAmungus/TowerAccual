@@ -11,9 +11,14 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-
+#include "Kismet/KismetMathLibrary.h"
+#include "Curves/CurveVector.h"
+#include "PlayerBullet.h"
+#include "TowerBlock.h"
+#include "TimerManager.h"
 
 #include "Engine/EngineTypes.h"
+
 
 
 // Sets default values
@@ -22,16 +27,17 @@ ATower::ATower()
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//runningSum = 0;
+	//Zpos = 0;
 
-	Zpos = 0;
 
-
-	BoxCollide = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collider"));
+	//BoxCollide = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collider"));
 
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("ROOT"));
 	RootComponent = Root;
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+//	BasicMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	
 
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
@@ -44,29 +50,32 @@ ATower::ATower()
 	
 	
 
-	Mesh->AttachToComponent(Root, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	BoxCollide->AttachToComponent(Root, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	//Mesh->AttachToComponent(Root, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	//BoxCollide->AttachToComponent(Root, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
 	
 	SpringArm->TargetArmLength = 600;
 	
 
-
-
-
+	//TEMPAddBasicTower();
+	//AddBasicTower();
+	//AddBasicTower();
 }
 
 // Called when the game starts or when spawned
 void ATower::BeginPlay()
 {
 	Super::BeginPlay();
+
+
+	//AddBasicTower();
 	
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	if (PlayerController) {
 
-		PlayerController->SetShowMouseCursor(true);
+		//PlayerController->SetShowMouseCursor(true);
 
-		//Wack but needed
+		//Wack but needed, nvm
 		//PlayerController->SetInputMode(FInputModeGameOnly());
 		
 
@@ -76,7 +85,8 @@ void ATower::BeginPlay()
 			Subsystem->AddMappingContext(PlayerMapCont,0);
 		}
 	}
-
+	AddBasicTower();
+	AddBasicTower();
 }
 
 // Called every frame
@@ -132,6 +142,8 @@ void ATower::Rotater(const FInputActionValue& Value) {
 	}
 }
 
+
+
 void ATower::Look(const FInputActionValue& Value)
 {
 
@@ -150,11 +162,12 @@ void ATower::Look(const FInputActionValue& Value)
 
 		}
 
-		float XDelta = ((ScreenSize.X / 2) - mouseX)*-1;
-		float YDelta = ((ScreenSize.Y / 2) - mouseY) * -1;
+		//float XDelta = ((ScreenSize.X / 2) - mouseX)*-1;
+		//float YDelta = ((ScreenSize.Y / 2) - mouseY) * 1;
 
 
-		FRotator NewRotation = FRotator(YDelta * 0.01, XDelta * 0.01, 0);
+		FRotator NewRotation = FRotator(LookAxisValue.Y, LookAxisValue.X, 0);
+
 
 		NewRotation.Roll = 0;
 
@@ -162,24 +175,46 @@ void ATower::Look(const FInputActionValue& Value)
 
 
 
-		Cam->AddLocalRotation(NewRotation.Quaternion(), false, 0);
+		//Cam->AddLocalRotation(NewRotation.Quaternion(), false, 0);
 
 		FRotator CamRotation = Cam->GetRelativeRotation();
 
 		CamRotation.Roll = 0;
 
-		Cam->SetRelativeRotation(CamRotation.Quaternion(), false, 0);
+		//FVector Desired = Cam->GetRelativeLocation();
 
+		//FRotator Des = FMath::Inter(CamRotation, NewRotation, GetWorld()->GetDeltaSeconds(), 40);
 		
+		//Cam->SetRelativeRotation(FMath::Lerp(FQuat(Cam->GetRelativeRotation()), CamRotation.Quaternion(),0.01), false, 0);
+		//Cam->SetRelativeRotation(FMath::Vinter)
+		//Cam->SetRelativeRotation(Des.Quaternion());
+		
+		FRotator test = CamRotation + NewRotation;
+		FRotator build = CamRotation;
+		if (test.Yaw < 45 && test.Yaw > -45) {
+			build.Yaw = test.Yaw;
+			
+		}
 
+		if (test.Pitch < 45 && test.Pitch > -45) {
+
+			build.Pitch = test.Pitch;
+		}
+
+		Cam->SetRelativeRotation(build.Quaternion(), false, 0);
 		//Cam->SetWorldRotation()
-
-		
-
 
 		if (GEngine)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::FromInt(XDelta));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Vector: %s"), *Des.ToString()));
+
+		}
+
+
+		if (GEngine)
+		{ 
+		//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Float Value: %f"), GetWorld()->GetDeltaSeconds()));
+
 
 		}
 		//AddControllerYawInput(LookAxisValue.X);
@@ -225,18 +260,75 @@ void ATower::Fire(const FInputActionValue& Value)
 {
 	const bool shot = Value.Get<bool>();
 
-	if (Controller) {
+	if (Controller && canFire) {
 
+		canFire = false;
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Instigator = this;
+		SpawnParams.OverrideLevel = GetWorld()->GetCurrentLevel();
+		//Cam->GetComponentRotation()Cam->GetComponentLocation()
+		FTimerHandle FireTimer;
+		AActor* Bull = GetWorld()->SpawnActor<APlayerBullet>(Bulletito, Cam->GetComponentLocation(), Cam->GetRelativeRotation(), SpawnParams);
+
+		Cast<APlayerBullet>(Bull)->SetterVelocity(Cam->GetComponentRotation().Vector() * 500);
+
+		
+		
+		GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &ATower::ResetFire, fireDelay);
 		//more later
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Vector: %s"), *Cam->GetRelativeRotation().ToString()));
+
+		}
 
 	}
 
 }
 
+void ATower::ResetFire() {
+
+	canFire = true;
+}
+
+bool ATower::CheckBlockExistance()
+{
+	if (TowerStack.Num() > 0) {
+
+		return true;
+	}
+
+
+	return false;
+}
+
+
+//dont use this ever
+void ATower::TEMPAddBasicTower() {
+
+	UTowerBlock* TemplateBlock = CreateDefaultSubobject<UTowerBlock>(TEXT("BLOCKBasic"));
+	TemplateBlock->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+}
+
+
+void ATower::AddBasicTower()
+{
+	UTowerBlock* TemplateBlock = NewObject<UTowerBlock>(this);
+		//CreateDefaultSubobject<UTowerBlock>(TEXT("BLOCKBasic"));	 
+
+	//TemplateBlock->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	//TemplateBlock->SetRelativeLocation(FVector(0, 0, runningSum));
+	
+	TemplateBlock->SetLoco(FVector(0, 0, runningSum));
+	runningSum = runningSum + 400;
+
+	TowerStack.Add(TemplateBlock);
 
 
 
-
+}
 
 // Called to bind functionality to input
 void ATower::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -258,6 +350,9 @@ void ATower::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnchancedInputComponent->BindAction(Zoomo, ETriggerEvent::Triggered, this, &ATower::Zoom);
 
 		EnchancedInputComponent->BindAction(UpDowno, ETriggerEvent::Triggered, this, &ATower::UpDown);
+
+		EnchancedInputComponent->BindAction(Shooto, ETriggerEvent::Triggered, this, &ATower::Fire);
+
 	}
 
 }
