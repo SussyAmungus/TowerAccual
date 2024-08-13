@@ -19,7 +19,7 @@
 
 #include "Engine/EngineTypes.h"
 
-
+#include "Components/SphereComponent.h"
 
 // Sets default values
 ATower::ATower()
@@ -277,6 +277,11 @@ void ATower::Fire(const FInputActionValue& Value)
 		
 		GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &ATower::ResetFire, fireDelay);
 		//more later
+
+		
+
+		//Cast<APlayerBullet>(Bull)->SphereComp->OnComponentBeginOverlap.AddDynamic(Cast<APlayerBullet>(Bull), &APlayerBullet::BeginComponentOverlap);
+
 
 		if (GEngine)
 		{

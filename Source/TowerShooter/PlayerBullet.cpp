@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "PlayerBullet.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -7,7 +7,10 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/SphereComponent.h"
-#include "PlayerBullet.h"
+
+
+//For player BP use playerbulletBp   
+
 
 
 // Sets default values
@@ -34,7 +37,7 @@ APlayerBullet::APlayerBullet()
 	ProjMove->ProjectileGravityScale = 0.1;
 	
 	
-	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &APlayerBullet::BeginComponentOverlap);
+	//SphereComp->OnComponentBeginOverlap.AddDynamic(this, &APlayerBullet::BeginComponentOverlap);
 }
 
 
@@ -51,6 +54,12 @@ void APlayerBullet::SetterVelocity(FVector FVect) {
 // Called when the game starts or when spawned
 void APlayerBullet::BeginPlay()
 {
+
+	//SphereComp->OnComponentBeginOverlap.AddDynamic(this, &APlayerBullet::BeginComponentOverlap);
+
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &APlayerBullet::OnOverlapBegin);
+	SphereComp->OnComponentEndOverlap.AddDynamic(this, &APlayerBullet::OnOverlapEnd);
+
 	Super::BeginPlay();
 	
 	
@@ -61,20 +70,49 @@ void APlayerBullet::BeginPlay()
 	
 }
 
-void APlayerBullet::BeginComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void APlayerBullet::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 
-	const FString otherName = OtherActor->GetName();
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, otherName);
+	APlayerBullet* Bulleter = Cast<APlayerBullet>(OtherActor);
 
+	if (OtherActor && (OtherActor != this) && OtherComp && Bulleter == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Overlap Begin"));
+
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactFX, GetActorLocation());
+		BulletHit();
+		Destroy();
 	}
-
-	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactFX, GetActorLocation());
-	//BulletHit();
-	//Destroy();
-
 }
+
+void APlayerBullet::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+
+	APlayerBullet* Bulleter = Cast<APlayerBullet>(OtherActor);
+	if (OtherActor && (OtherActor != this) && OtherComp && Bulleter == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Overlap End"));
+
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactFX, GetActorLocation());
+		BulletHit();
+		Destroy();
+	}
+}
+
+//void APlayerBullet::BeginComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//
+//	const FString otherName = OtherActor->GetName();
+//	if (GEngine) {
+//		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, otherName);
+//
+//	}
+//
+//	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactFX, GetActorLocation());
+//	BulletHit();
+//	Destroy();
+//
+//}
 
 void APlayerBullet::BulletHit()
 {

@@ -9,7 +9,12 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Character.h"
 #include "TowerBlock.h"
+#include "PlaneBullet.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "TimerManager.h"
 #include "EngineUtils.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/SphereComponent.h"
 
 
 // Sets default values
@@ -73,11 +78,27 @@ void ABasicPlane::BeginPlay()
 	}
 
 
-	
 
 }
+//used to shoot
+void ABasicPlane::planeFire() {
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Instigator = this;
+	SpawnParams.OverrideLevel = GetWorld()->GetCurrentLevel();
+	//Cam->GetComponentRotation()Cam->GetComponentLocation()
+	FTimerHandle FireTimer;
 
+	FVector Forward = GetActorLocation() - Target->GetActorLocation();
 
+	FVector WorldUp = FVector::UpVector;
+
+	FRotator Rota = UKismetMathLibrary::MakeRotFromXZ(Forward, WorldUp);
+
+	AActor* Bullo = GetWorld()->SpawnActor<APlaneBullet>(Bulletito, GetActorLocation(), Rota, SpawnParams);
+
+	Cast<APlaneBullet>(Bullo)->SetterVelocityo(Rota.Vector() * -500);
+
+}
 
 // Called every frame
 void ABasicPlane::Tick(float DeltaTime)
@@ -105,8 +126,22 @@ void ABasicPlane::Tick(float DeltaTime)
 		}
 
 		if (Target->CheckBlockExistance()) {
-			MovePlane(DeltaTime);
 
+			MovePlane(DeltaTime);
+			if (canFire) {
+
+				if (GEngine) {
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString(TEXT("Spawned")));
+
+				}
+
+				planeFire();
+				canFire = false;
+				
+				FTimerHandle FireTimer;
+				GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &ABasicPlane::ResetFire, 1);
+			}
+			
 		}
 
 		
@@ -114,6 +149,11 @@ void ABasicPlane::Tick(float DeltaTime)
 
 
 
+}
+
+void ABasicPlane::ResetFire() {
+
+	canFire = true;
 }
 
 void ABasicPlane::MovePlane(float Delta) {
@@ -175,9 +215,11 @@ void ABasicPlane::MovePlane(float Delta) {
 		float Radians = FMath::DegreesToRadians(CurrentAngle);
 		FVector NewLocation = CenterPnt + FVector(Radius * FMath::Cos(Radians), Radius * FMath::Sin(Radians), 0.0f);
 
+		FRotator NewRot = FRotator(0, CurrentAngle, 0);
+
 		// Set the new location of the actor
 		SetActorLocation(NewLocation);
-
+		SetActorRotation(NewRot);
 	}
 
 

@@ -6,8 +6,10 @@
 #include "GameFramework/Pawn.h"
 #include "Tower.h"
 #include "GameFramework/GameMode.h"
-#include "TimerManager.h"
+
 #include "BasicPlane.generated.h"
+
+class APlaneBullet;
 
 UCLASS()
 class TOWERSHOOTER_API ABasicPlane : public APawn
@@ -22,19 +24,26 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void planeFire();
+
 	
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void ResetFire();
+
 	void MovePlane(float Delta);
 
 	void InitTarget();
 
+	UPROPERTY(EditAnywhere)
+	class TSubclassOf <APlaneBullet> Bulletito;
 	
+	bool canFire = true;
+
 	
-	 
 	UPROPERTY()
 	USceneComponent* Root;
 

@@ -4,21 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-
-#include "PlayerBullet.generated.h"
+#include "PlaneBullet.generated.h"
 
 class UPrimitiveComponent;
 
 UCLASS()
-class TOWERSHOOTER_API APlayerBullet : public AActor
+class TOWERSHOOTER_API APlaneBullet : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	APlayerBullet();
+	APlaneBullet();
 
-	void SetterVelocity(FVector FVect);
+
+	void SetterVelocityo(FVector FVect);
 
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* SphereComp;
@@ -45,13 +45,9 @@ public:
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	
-	
 
 	virtual void BulletHit();
 
