@@ -9,7 +9,7 @@
 
 #include "BasicPlane.generated.h"
 
-class APlaneBullet;
+ class APlaneBulletNEW;
 
 UCLASS()
 class TOWERSHOOTER_API ABasicPlane : public APawn
@@ -39,7 +39,7 @@ public:
 	void InitTarget();
 
 	UPROPERTY(EditAnywhere)
-	class TSubclassOf <APlaneBullet> Bulletito;
+	class TSubclassOf <APlaneBulletNEW> Bulletito;
 	
 	bool canFire = true;
 
@@ -57,11 +57,18 @@ public:
 	float Speed;
 
 	UPROPERTY(EditAnywhere)
-	float Radius;
+	float DesRadius;
+
+	//sorta set when its spawned
+	float CurRadius;
 
 
 	//Bottom Most starts at 0
-	int Block;
+	int Block = 0;
+
+
+	bool isCounter = false;
+
 
 	FVector CenterPnt;
 	

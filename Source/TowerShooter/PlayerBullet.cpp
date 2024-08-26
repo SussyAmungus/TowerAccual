@@ -58,13 +58,13 @@ void APlayerBullet::BeginPlay()
 	//SphereComp->OnComponentBeginOverlap.AddDynamic(this, &APlayerBullet::BeginComponentOverlap);
 
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &APlayerBullet::OnOverlapBegin);
-	SphereComp->OnComponentEndOverlap.AddDynamic(this, &APlayerBullet::OnOverlapEnd);
+	//SphereComp->OnComponentEndOverlap.AddDynamic(this, &APlayerBullet::OnOverlapEnd);
 
 	Super::BeginPlay();
 	
 	
 	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString(TEXT("Spawned")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString(TEXT("Spawned")));
 
 	}
 	
@@ -77,11 +77,11 @@ void APlayerBullet::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cl
 
 	if (OtherActor && (OtherActor != this) && OtherComp && Bulleter == nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Overlap Begin"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Overlap Begin"));
 
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactFX, GetActorLocation());
 		BulletHit();
-		Destroy();
+		this->Destroy();
 	}
 }
 
@@ -95,7 +95,7 @@ void APlayerBullet::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, clas
 
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactFX, GetActorLocation());
 		BulletHit();
-		Destroy();
+		
 	}
 }
 
@@ -121,7 +121,7 @@ void APlayerBullet::BulletHit()
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString(TEXT("Moving")));
 
 	}
-
+	//BulletHit();
 }
 
 // Called every frame

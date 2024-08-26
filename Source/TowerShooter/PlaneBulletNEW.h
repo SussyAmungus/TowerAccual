@@ -4,18 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "PlaneBullet.generated.h"
+#include "PlaneBulletNEW.generated.h"
+
 
 class UPrimitiveComponent;
 
+//class ABasicPlane;
+
 UCLASS()
-class TOWERSHOOTER_API APlaneBullet : public AActor
+class TOWERSHOOTER_API APlaneBulletNEW : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
-	APlaneBullet();
+	APlaneBulletNEW();
 
 
 	void SetterVelocityo(FVector FVect);
@@ -49,12 +52,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void BulletHit();
+	void BulletHit();
+
+	//virtual void BulletHit();
 
 	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* ImpactFX;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

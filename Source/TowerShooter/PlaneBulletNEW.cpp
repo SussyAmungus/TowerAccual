@@ -1,5 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-#include "PlaneBullet.h"
+
+
+#include "PlaneBulletNEW.h"
+
+// Fill out your copyright notice in the Description page of Project Settings.
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -10,12 +14,12 @@
 #include "BasicPlane.h"
 
 
-class ABasicPlane;
+
 
 // Sets default values
-APlaneBullet::APlaneBullet()
+APlaneBulletNEW::APlaneBulletNEW()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 
@@ -40,17 +44,17 @@ APlaneBullet::APlaneBullet()
 }
 
 // Called when the game starts or when spawned
-void APlaneBullet::BeginPlay()
+void APlaneBulletNEW::BeginPlay()
 {
-	Super::BeginPlay();
-	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &APlaneBullet::OnOverlapBegin);
-	SphereComp->OnComponentEndOverlap.AddDynamic(this, &APlaneBullet::OnOverlapEnd);
 	
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &APlaneBulletNEW::OnOverlapBegin);
+	//SphereComp->OnComponentEndOverlap.AddDynamic(this, &APlaneBulletNEW::OnOverlapEnd);
+	Super::BeginPlay();
 }
-void APlaneBullet::BulletHit()
+void APlaneBulletNEW::BulletHit()
 {
 }
-void APlaneBullet::SetterVelocityo(FVector FVect) {
+void APlaneBulletNEW::SetterVelocityo(FVector FVect) {
 
 	if (ProjMove) {
 
@@ -58,44 +62,48 @@ void APlaneBullet::SetterVelocityo(FVector FVect) {
 	}
 }
 
-void APlaneBullet::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void APlaneBulletNEW::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 
-	ABasicPlane* Planer = Cast<ABasicPlane>(OtherActor);
-	APlaneBullet* Bulleter= Cast<APlaneBullet>(OtherActor);
+	//class ABasicPlane;
 
-	if (OtherActor && (OtherActor != this) && OtherComp && Planer == nullptr && Bulleter == nullptr)
+	ABasicPlane* Planer = Cast<ABasicPlane>(OtherActor);
+	APlaneBulletNEW* Bulleter = Cast<APlaneBulletNEW>(OtherActor);
+
+	
+	if (OtherActor && (OtherActor != this) && OtherComp && Bulleter == nullptr && Planer == nullptr)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Overlap Begin"));
 
 		const FString otherName = OtherActor->GetName();
 		if (GEngine) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, otherName);
+		//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, otherName);
 		}
 
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactFX, GetActorLocation());
 		BulletHit();
-		Destroy();
+		this->Destroy();
 	}
 }
 
-void APlaneBullet::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void APlaneBulletNEW::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 
-	ABasicPlane* Planer = Cast<ABasicPlane>(OtherActor);
-	APlaneBullet* Bulleter = Cast<APlaneBullet>(OtherActor);
-	if (OtherActor && (OtherActor != this) && OtherComp && Planer == nullptr && Bulleter == nullptr)
+	//ABasicPlane* Planer = Cast<ABasicPlane>(OtherActor);
+	APlaneBulletNEW* Bulleter = Cast<APlaneBulletNEW>(OtherActor);
+	//&& Planer == nullpt
+	if (OtherActor && (OtherActor != this) && OtherComp  && Bulleter == nullptr)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Overlap End"));
 
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactFX, GetActorLocation());
 		BulletHit();
-		Destroy();
+		this->Destroy();
 	}
 }
 
 // Called every frame
-void APlaneBullet::Tick(float DeltaTime)
+void APlaneBulletNEW::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 

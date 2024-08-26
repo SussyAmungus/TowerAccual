@@ -70,7 +70,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere)
-	class TSubclassOf <APlayerBullet> Bulletito;
+	class TSubclassOf <APlayerBullet> Bulletitor;
 
 	UPROPERTY(EditAnywhere)
 	float fireDelay;
@@ -96,9 +96,11 @@ public:
 
 	TArray<UTowerBlock*> TowerStack;
 
-	double runningSum;
+	double runningSum = 150;
 
 	void TEMPAddBasicTower();
+
+	void AddBasicTowerConst(FString text);
 
 	void AddBasicTower();
 	bool CheckBlockExistance();

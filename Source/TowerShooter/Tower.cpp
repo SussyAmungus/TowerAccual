@@ -53,13 +53,33 @@ ATower::ATower()
 	//Mesh->AttachToComponent(Root, FAttachmentTransformRules::SnapToTargetIncludingScale);
 	//BoxCollide->AttachToComponent(Root, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
-	
+	/*
 	SpringArm->TargetArmLength = 600;
 	
+	////////COPY
+	UTowerBlock* TemplateBlock = CreateDefaultSubobject<UTowerBlock>(TEXT("One"));
 
-	//TEMPAddBasicTower();
-	//AddBasicTower();
-	//AddBasicTower();
+	TemplateBlock->SetLoco(FVector(0, 0, 400));
+	runningSum = runningSum + 400;
+
+	TowerStack.Add(TemplateBlock);
+	*/
+	///////PASTE
+
+	////////COPY ---> This one doesnt work for some reason ill prob fix this later it doesnt really matter for first round bc its prob short or some, other rounds will not face this issue
+	/*UTowerBlock* TemplateBlock2 = CreateDefaultSubobject<UTowerBlock>(TEXT("TWO"));
+
+	TemplateBlock2->SetLoco(FVector(0, 100, runningSum));
+	runningSum = runningSum + 400;
+
+	TowerStack.Add(TemplateBlock2);*/
+	///////PASTE
+
+	//could casue issues
+
+	///WILL ONLY GIVE TWO FOR THE FIRST ROUND TYPE SHIT MUST ADD/DUPE CODE MANUALY FOR MORE STARTING THINGS, OR DELAY WHEN IT TRYS TO GET THE TOWER STACK DATA BC GAMEMODES CONST IS TOO EARLY (prob better solution
+	//Prob needs to be fixed with the delay thing or a better way to create defult subobjects
+	
 }
 
 // Called when the game starts or when spawned
@@ -85,8 +105,10 @@ void ATower::BeginPlay()
 			Subsystem->AddMappingContext(PlayerMapCont,0);
 		}
 	}
+	
 	AddBasicTower();
 	AddBasicTower();
+
 }
 
 // Called every frame
@@ -269,7 +291,7 @@ void ATower::Fire(const FInputActionValue& Value)
 		SpawnParams.OverrideLevel = GetWorld()->GetCurrentLevel();
 		//Cam->GetComponentRotation()Cam->GetComponentLocation()
 		FTimerHandle FireTimer;
-		AActor* Bull = GetWorld()->SpawnActor<APlayerBullet>(Bulletito, Cam->GetComponentLocation(), Cam->GetRelativeRotation(), SpawnParams);
+		AActor* Bull = GetWorld()->SpawnActor<APlayerBullet>(Bulletitor, Cam->GetComponentLocation(), Cam->GetRelativeRotation(), SpawnParams);
 
 		Cast<APlayerBullet>(Bull)->SetterVelocity(Cam->GetComponentRotation().Vector() * 500);
 
@@ -285,7 +307,7 @@ void ATower::Fire(const FInputActionValue& Value)
 
 		if (GEngine)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Vector: %s"), *Cam->GetRelativeRotation().ToString()));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Vector: %s"), *Cam->GetRelativeRotation().ToString()));
 
 		}
 
@@ -317,6 +339,18 @@ void ATower::TEMPAddBasicTower() {
 	TemplateBlock->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
+//only really used to create a tocker block during a constructor ALSO NOT POSSIBLE // USED TO DUPE TEXT
+void ATower::AddBasicTowerConst(FString texta)
+{
+
+	UTowerBlock* TemplateBlock = CreateDefaultSubobject<UTowerBlock>(*texta);
+	
+	TemplateBlock->SetLoco(FVector(0, 0, runningSum));
+	runningSum = runningSum + 400;
+
+	TowerStack.Add(TemplateBlock);
+
+}
 
 void ATower::AddBasicTower()
 {
